@@ -56,12 +56,12 @@ exports.getLogsFromAPI = function (query, callback) {
                 body.replace(logsGroupRegex, function (substring) {
                     body = body.substring(substring.length+1);
                     var logData = JSON.parse(substring);
-                    logs.push();
+                    logs.push(logData);
                     var newLog = new Log(logData);
                     newLog.save(function(error, log) {
-                        if (error) process.nextTick(function () {
+                        if (error){
                             callback(error);
-                        });
+                        }
                     })
                     return '';
                 })
@@ -76,6 +76,7 @@ exports.getLogsFromAPI = function (query, callback) {
                 parameters: url
             });
             newRequest.save();
+            callback(null, logs);
         })
 
     }).end();

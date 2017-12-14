@@ -5,7 +5,7 @@ var LogSchema = new Schema({
     cd_cebroker_state: String,
     pro_cde: Number,
     cd_profession: String,
-    id_license: Number,
+    id_license: String,
     dt_end: Date,
     cd_environment: String,
     dt_Start_Log: Date,
