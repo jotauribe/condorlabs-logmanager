@@ -4,10 +4,13 @@
 var LogService = require('../services/log.service');
 
 exports.getLogs = function (request, response) {
-
-    LogService.getLogsFromAPI(request.query, function (error, logs) {
-        console.log('logs from logservice  ',logs)
-        if (error) response.send(logs);
-        response.send(logs);
+    LogService.getMostRecentLogInDatabase(request.query, function (error, logs) {
+        //var date = logs[0].dt_Start_Log;
+        //console.log(date);
+        LogService.getLogsFromAPI(request.query, logs[0], function (error, logs) {
+            if (error) response.send(logs);
+            console.log(logs.length)
+            response.send(logs);
+        });
     });
 }
