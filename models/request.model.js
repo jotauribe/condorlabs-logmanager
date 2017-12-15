@@ -7,8 +7,7 @@ var RequestSchema = new Schema({
     parameters: String
 },
 {
-    versionKey:false //to not add field "_v" in json
-}
-);
+    versionKey:false 
+});
 
 module.exports = mongoose.model('Requests', RequestSchema);
