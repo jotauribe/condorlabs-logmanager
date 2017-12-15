@@ -15,8 +15,7 @@ var LogSchema = new Schema({
     id_client_nbr: Number
 },
 {
-    versionKey:false //to not add field "_v" in json
-}
-);
+    versionKey:false
+});
 
 module.exports = mongoose.model('Logs', LogSchema);
