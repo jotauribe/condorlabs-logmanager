@@ -13,6 +13,10 @@ var LogSchema = new Schema({
     dt_end_log: Date,
     cd_machine: String,
     id_client_nbr: Number
-});
+},
+{
+    versionKey:false //to not add field "_v" in json
+}
+);
 
 module.exports = mongoose.model('Logs', LogSchema);
