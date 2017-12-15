@@ -1,6 +1,7 @@
 'use strict';
 
 var http = require('https'),
+    Timestamp = require('mongodb').timestamp,
     mongoose = require('mongoose'),
     async = require('async'),
     URL = require('url'),
@@ -20,23 +21,27 @@ exports.getMostRecentLogInDatabase = function (query, callback) {
     var initTime = new Date();
     var queryObject = buildQueryObject(query);
     //Getting the last generated log
-    Log.find(queryObject)
-       .sort('-dt_Start_Log')
+    Log.find({cd_cebroker_state: queryObject.cd_cebroker_state,
+        dt_Start_Log: {
+                    $gte: new Date('2017-12-14'),
+                    $lt: new Date('2017-12-15')}
+                      })
        .limit(1)
-       .select({
-            cd_cebroker_state: 1,
-            pro_cde: 1,
-            cd_profession: 1,
-            id_license: 1,
-            dt_end: 1,
-            cd_environment: 1,
-            dt_Start_Log: 1,
-            ds_compl_status_returned: 1,
-            dt_end_log: 1,
-            cd_machine: 1,
-            id_client_nbr: 1})
+       .sort('-dt_Start_Log')
+       .select('cd_cebroker_state '
+              +'pro_cde cd_profession '
+              +'id_license '
+              +'dt_end '
+              +'cd_environment '
+              +'dt_Start_Log '
+              +'ds_compl_status_returned '
+              +'dt_end_log '
+              +'cd_machine '
+              +'id_client_nbr')
+       .lean()
        .exec(function (error, log) {
            if (error) callback(error, null);
+           log = JSON.parse(JSON.stringify(log));
            callback(null, log);
        });
 }
@@ -50,14 +55,16 @@ exports.getLogsFromAPI = function (query, until, callback) {
         var body = '';
         response.on('data', function (chunk) {
             body += chunk;
-            process.nextTick(function () {
-                body.replace(logsGroupRegex, function (substring) {
-                    body = body.substring(substring.length+1);
-                    var logData = JSON.parse(substring);
-                    console.log(substring);
+            //process.nextTick(function () {
+                var i = 0;
+                body = body.replace(logsGroupRegex, function (substring) {
+                    //body = body.substring(substring.length+1);
+                    var logFromAPI = JSON.parse(substring);
+
                     if(until){
-                        var aDate = new Date(logData.dt_Start_Log);
-                        if(aDate.getTime() < until.dt_Start_Log.getTime()){
+                        var logAPIDate = new Date(logFromAPI.dt_Start_Log);
+                        var untilDate = new Date(until.dt_Start_Log);
+                        if(logAPIDate.getTime() < untilDate.getTime()){
                             var endTime = new Date().getTime();
                             var responseTime = endTime - initTime.getTime();
                             var newRequest = new Request({
@@ -65,19 +72,32 @@ exports.getLogsFromAPI = function (query, until, callback) {
                                 response_time: responseTime,
                                 parameters: url
                             });
-                            newRequest.save();
-                            callback(null, logs);
+                            newRequest.save(function (error, request) {
+                                if(error) callback(error, null);
+                                response.destroy();
+                            });
+                        } else{
+                            logs.push(logFromAPI);
+                            var newLog = new Log(logFromAPI);
+                            newLog.save(function(error, log) {
+                                if (error){
+                                    callback(error);
+                                }
+                            })
                         }
+
                     }
-                    logs.push(logData);
-                    var newLog = new Log(logData);
-                    newLog.save(function(error, log) {
-                        if (error){
-                            callback(error);
-                        }
-                    })
+                    else{
+                        logs.push(logFromAPI);
+                        var newLog = new Log(logFromAPI);
+                        newLog.save(function(error, log) {
+                            if (error){
+                                callback(error);
+                            }
+                        })
+                    }
                 })
-            })
+            //})
         });
         response.on('end', function () {
             var endTime = new Date().getTime();
@@ -92,11 +112,12 @@ exports.getLogsFromAPI = function (query, until, callback) {
         })
 
     }).end();
+
 }
 
 var buildQueryObject = function (query) {
     var queryObject = {};
-    if(query.startdate) queryObject['dt_Start_Log'] = {$gte: new Date(query.startdate), $lt: new Date(query.enddate)};
+    if(query.startdate) queryObject['dt_Start_Log'] = {$gt: new Date(query.startdate), $lt: new Date(query.enddate)};
     if(query.state) queryObject['cd_cebroker_state'] = query.state;
     return queryObject;
 }
