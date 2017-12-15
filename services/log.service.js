@@ -1,10 +1,8 @@
 'use strict';
 
 var http = require('https'),
-    Timestamp = require('mongodb').timestamp,
     mongoose = require('mongoose'),
     async = require('async'),
-    URL = require('url'),
     Log = require('../models/log.model'),
     Request = require('../models/request.model'),
     defaults = require('../config/defaults'),
@@ -21,11 +19,7 @@ exports.getMostRecentLogInDatabase = function (query, callback) {
     var initTime = new Date();
     var queryObject = buildQueryObject(query);
     //Getting the last generated log
-    Log.find({cd_cebroker_state: queryObject.cd_cebroker_state,
-        dt_Start_Log: {
-                    $gte: new Date('2017-12-14'),
-                    $lt: new Date('2017-12-16')}
-                      })
+    Log.find(queryObject)
        .limit(1)
        .sort('-dt_Start_Log')
        .select('cd_cebroker_state '
@@ -38,7 +32,6 @@ exports.getMostRecentLogInDatabase = function (query, callback) {
               +'dt_end_log '
               +'cd_machine '
               +'id_client_nbr')
-       //.lean()
        .exec(function (error, log) {
            if (error) callback(error, null);
            if(log[0]){
@@ -61,27 +54,37 @@ exports.getLogsFromAPI = function (query, until, callback) {
             process.nextTick(function () {
                 var i = 0;
                 body = body.replace(logsGroupRegex, function (substring) {
-                    //body = body.substring(substring.length+1);
                     var logFromAPI = JSON.parse(substring);
 
                     if(until){
                         let logAPIDate = new Date(logFromAPI.dt_Start_Log);
-                        console.log("ENTRADA A LA ZONA PROHIBIDA");
-                        console.log("FECHA API: ", logAPIDate);
-                        console.log("FECHA DB: ", until.dt_Start_Log);
                         if(logAPIDate.getTime() < until.dt_Start_Log.getTime()){
                             response.destroy();
                         } else{
-                            logs.push(logFromAPI);
-                            var newLog = new Log(logFromAPI);
-                            newLog.save(function(error, log) {
-                                if (error){
-                                    callback(error);
-                                }
-                            })
-                        }
+                            if (logAPIDate.getTime() == until.dt_Start_Log.getTime()){
+                                //DON'T INSERT IF ITS THE SAME RECORD
+                                var newLog = new Log(logFromAPI);
+                                Log.findOneAndUpdate(
+                                    logFromAPI,
+                                    logFromAPI,
+                                    {upsert: true, sort: {'dt_Start_Log': -1}},
+                                    function (err, log) {
+                                        if (log) console.log("DB:  ", log, "  API:  ", logFromAPI);
+                                        else logs.push(log);
+                                    }
+                                );
+                            } else{
+                                logs.push(logFromAPI);
+                                var newLog = new Log(logFromAPI);
+                                newLog.save(function(error, log) {
+                                    if (error){
+                                        callback(error);
+                                    }
+                                })
+                            }}
                     }
                     else{
+                        //TODO: Validate the existence of the registry in the database
                         logs.push(logFromAPI);
                         var newLog = new Log(logFromAPI);
                         newLog.save(function(error, log) {
@@ -109,7 +112,7 @@ exports.getLogsFromAPI = function (query, until, callback) {
 
 var buildQueryObject = function (query) {
     var queryObject = {};
-    if(query.startdate) queryObject['dt_Start_Log'] = {$gt: new Date(query.startdate), $lt: new Date(query.enddate)};
+    if(query.startdate) queryObject['dt_Start_Log'] = {$gte: new Date(query.startdate), $lt: new Date(query.enddate)};
     if(query.state) queryObject['cd_cebroker_state'] = query.state;
     return queryObject;
 }
