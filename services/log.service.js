@@ -24,7 +24,7 @@ exports.getMostRecentLogInDatabase = function (query, callback) {
     Log.find({cd_cebroker_state: queryObject.cd_cebroker_state,
         dt_Start_Log: {
                     $gte: new Date('2017-12-14'),
-                    $lt: new Date('2017-12-15')}
+                    $lt: new Date('2017-12-16')}
                       })
        .limit(1)
        .sort('-dt_Start_Log')
@@ -38,10 +38,13 @@ exports.getMostRecentLogInDatabase = function (query, callback) {
               +'dt_end_log '
               +'cd_machine '
               +'id_client_nbr')
-       .lean()
+       //.lean()
        .exec(function (error, log) {
            if (error) callback(error, null);
-           log = JSON.parse(JSON.stringify(log));
+           if(log[0]){
+               var nLog = JSON.parse(JSON.stringify(log[0]));
+               console.log("el original: ",nLog, "date: ", nLog.dt_Start_Log);
+           }
            callback(null, log);
        });
 }
@@ -55,27 +58,19 @@ exports.getLogsFromAPI = function (query, until, callback) {
         var body = '';
         response.on('data', function (chunk) {
             body += chunk;
-            //process.nextTick(function () {
+            process.nextTick(function () {
                 var i = 0;
                 body = body.replace(logsGroupRegex, function (substring) {
                     //body = body.substring(substring.length+1);
                     var logFromAPI = JSON.parse(substring);
 
                     if(until){
-                        var logAPIDate = new Date(logFromAPI.dt_Start_Log);
-                        var untilDate = new Date(until.dt_Start_Log);
-                        if(logAPIDate.getTime() < untilDate.getTime()){
-                            var endTime = new Date().getTime();
-                            var responseTime = endTime - initTime.getTime();
-                            var newRequest = new Request({
-                                date: initTime,
-                                response_time: responseTime,
-                                parameters: url
-                            });
-                            newRequest.save(function (error, request) {
-                                if(error) callback(error, null);
-                                response.destroy();
-                            });
+                        let logAPIDate = new Date(logFromAPI.dt_Start_Log);
+                        console.log("ENTRADA A LA ZONA PROHIBIDA");
+                        console.log("FECHA API: ", logAPIDate);
+                        console.log("FECHA DB: ", until.dt_Start_Log);
+                        if(logAPIDate.getTime() < until.dt_Start_Log.getTime()){
+                            response.destroy();
                         } else{
                             logs.push(logFromAPI);
                             var newLog = new Log(logFromAPI);
@@ -85,19 +80,16 @@ exports.getLogsFromAPI = function (query, until, callback) {
                                 }
                             })
                         }
-
                     }
                     else{
                         logs.push(logFromAPI);
                         var newLog = new Log(logFromAPI);
                         newLog.save(function(error, log) {
-                            if (error){
-                                callback(error);
-                            }
+                            if (error) callback(error);
                         })
                     }
                 })
-            //})
+            })
         });
         response.on('end', function () {
             var endTime = new Date().getTime();
