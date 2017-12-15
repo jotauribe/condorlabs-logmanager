@@ -14,7 +14,6 @@ mongoose.connect(connectionURL);
 
 var logsGroupRegex = /({[^{}]+})+/g;
 
-
 exports.getMostRecentLogInDatabase = function (query, callback) {
     var initTime = new Date();
     var queryObject = buildQueryObject(query);
@@ -62,7 +61,6 @@ exports.getLogsFromAPI = function (query, until, callback) {
                             response.destroy();
                         } else{
                             if (logAPIDate.getTime() == until.dt_Start_Log.getTime()){
-                                //DON'T INSERT IF ITS THE SAME RECORD
                                 var newLog = new Log(logFromAPI);
                                 Log.findOneAndUpdate(
                                     logFromAPI,
@@ -84,7 +82,6 @@ exports.getLogsFromAPI = function (query, until, callback) {
                             }}
                     }
                     else{
-                        //TODO: Validate the existence of the registry in the database
                         logs.push(logFromAPI);
                         var newLog = new Log(logFromAPI);
                         newLog.save(function(error, log) {
@@ -105,9 +102,7 @@ exports.getLogsFromAPI = function (query, until, callback) {
             newRequest.save();
             callback(null, logs);
         })
-
     }).end();
-
 }
 
 var buildQueryObject = function (query) {
