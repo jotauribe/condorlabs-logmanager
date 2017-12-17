@@ -1,6 +1,5 @@
 "use strict";
 
-import { Assert } from "./Model";
-import Log from "./Log";
+import Log from "./log";
 
-export { Assert, Log };
+export { Log };
