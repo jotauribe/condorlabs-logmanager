@@ -25,9 +25,9 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', index);
 app.use('/logs', logs);
 
-/** catch 404 and forward to error handler
+// catch 404 and forward to error handler
 app.use(function(req, res, next) {
     res.render('error')
 });
-*/
+
 module.exports = app;
