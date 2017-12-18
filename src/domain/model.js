@@ -2,7 +2,7 @@
 
 export class Assert{
 
-    static DATE_REGEX = /^(0?[1-9]|1[012])[\/\-](0?[1-9]|[12][0-9]|3[01])[\/\-]\d{4}$/;
+    static DATE_REGEX = /^(\d{4}[\/\-](0?[1-9]|1[012])[\/\-](0?[1-9]|[12][0-9]|3[01]))(T(20|21|22|23|[0-1]?\d{1}):([0-5]?\d{1}):([0-5]?\d{1})(\.\d{3}(\d{3}|Z)?)?)?$/;
 
     /**
      *
@@ -40,10 +40,10 @@ export class Assert{
         let separator = /\//.test(dateString)? '/' : '-';
 
         // Parse the date parts to integers
-        var parts = dateString.split('');
-        var day = parseInt(parts[1], 10);
-        var month = parseInt(parts[0], 10);
-        var year = parseInt(parts[2], 10);
+        var parts = dateString.split(separator);
+        var day = parseInt(parts[2], 10);
+        var month = parseInt(parts[1], 10);
+        var year = parseInt(parts[0], 10);
 
         // Check the ranges of month and year
         if(year < 1000 || year > 3000 || month == 0 || month > 12)

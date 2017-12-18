@@ -35,7 +35,7 @@ exports.getMostRecentLogInDatabase = function (query, callback) {
            if (error) callback(error, null);
            if(log[0]){
                var nLog = JSON.parse(JSON.stringify(log[0]));
-               console.log("el original: ",nLog, "date: ", nLog.dt_Start_Log);
+               console.log("MOST RECENT LOG: ",nLog, "\ndate: ", nLog.dt_Start_Log);
            }
            callback(null, log);
        });
@@ -75,9 +75,9 @@ exports.getLogsFromAPI = function (query, until, callback) {
                                 logs.push(logFromAPI);
                                 var newLog = new Log(logFromAPI);
                                 newLog.save(function(error, log) {
-                                    if (error){
-                                        callback(error);
-                                    }
+                                    if (error) callback(error);
+
+                                    console.log("logFromAPIDate:  ", logAPIDate," ENTRO!!  API: ", newLog.dt_Start_Log, "UNTIL: ", until.dt_Start_Log )
                                 })
                             }}
                     }

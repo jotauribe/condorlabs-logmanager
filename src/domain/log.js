@@ -29,7 +29,7 @@ export default class Log {
         this._licenseID = licenseID;
 
         Assert.isValidDate(cycleEndDate,"Cycle End Date must to be a valid Date");
-        this._cycleEndDate = cycleEndDate;
+        this._cycleEndDate = new Date(cycleEndDate);
 
         Assert.isTypeOf(complianceStatus, "string", "Compliance Status must to be a string");
         this._complianceStatus = complianceStatus;
@@ -38,10 +38,10 @@ export default class Log {
         this._clientID = clientID;
 
         Assert.isValidDate(startLogDate, "Start Log Date must to be a valid Date");
-        this._startLogDate = startLogDate;
+        this._startLogDate = new Date(startLogDate);
 
         Assert.isValidDate(endLogDate, "End Log Date must to be a valid Date");
-        this._endLogDate = endLogDate;
+        this._endLogDate = new Date(endLogDate);
 
         Assert.isTypeOf(environment, "string", "Environment Status must to be a string");
         this._environment = environment;
@@ -87,7 +87,7 @@ export default class Log {
 
     set cycleEndDate(value) {
         Assert.isValidDate(value, "Cycle End Date must to be a valid Date");
-        this._cycleEndDate = value;
+        this._cycleEndDate = new Date(value);
     }
 
     set complianceStatus(value) {
@@ -102,12 +102,12 @@ export default class Log {
 
     set startLogDate(value) {
         Assert.isValidDate(value, "Start Log Date must to be a valid Date");
-        this._startLogDate = value;
+        this._startLogDate = new Date(value);
     }
 
     set endLogDate(value) {
         Assert.isValidDate(value, "End Log Date must to be a valid Date");
-        this._endLogDate = value;
+        this._endLogDate = new Date(value);
     }
 
     set environment(value) {
