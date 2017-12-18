@@ -107,7 +107,9 @@ exports.getLogsFromAPI = function (query, until, callback) {
 
 var buildQueryObject = function (query) {
     var queryObject = {};
-    if(query.startdate) queryObject['dt_Start_Log'] = {$gte: new Date(query.startdate), $lt: new Date(query.enddate)};
+    let endDate = new Date(query.enddate);
+    endDate.setHours(endDate.getHours() + 24);
+    if(query.startdate) queryObject['dt_Start_Log'] = {$gte: new Date(query.startdate), $lt: endDate};
     if(query.state) queryObject['cd_cebroker_state'] = query.state;
     return queryObject;
 }
