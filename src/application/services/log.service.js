@@ -3,11 +3,12 @@
 var http = require('https'),
     mongoose = require('mongoose'),
     async = require('async'),
-    Log = require('../models/log.model'),
-    Request = require('../models/request.model'),
-    defaults = require('../config/defaults'),
+    Log = require('src/infrastructure/models/log.model'),
+    Request = require('src/infrastructure/models/request.model'),
+    defaults = require('config/defaults'),
     connectionURL = defaults['database_connection_string'],
-    apiUrl = defaults['logs_endpoint'];
+    apiUrl = defaults['logs_endpoint'],
+    dateRegex = defaults['date_regex'];
 
 mongoose.Promise = global.Promise;
 mongoose.connect(connectionURL);
@@ -76,8 +77,6 @@ exports.getLogsFromAPI = function (query, until, callback) {
                                 var newLog = new Log(logFromAPI);
                                 newLog.save(function(error, log) {
                                     if (error) callback(error);
-
-                                    console.log("logFromAPIDate:  ", logAPIDate," ENTRO!!  API: ", newLog.dt_Start_Log, "UNTIL: ", until.dt_Start_Log )
                                 })
                             }}
                     }
@@ -107,9 +106,12 @@ exports.getLogsFromAPI = function (query, until, callback) {
 
 var buildQueryObject = function (query) {
     var queryObject = {};
-    let endDate = new Date(query.enddate);
+    let startDate = buildDateFromString(query.startdate);
+    console.log("La fecha construida star: ", startDate);
+    let endDate = buildDateFromString(query.enddate);
     endDate.setHours(endDate.getHours() + 24);
-    if(query.startdate) queryObject['dt_Start_Log'] = {$gte: new Date(query.startdate), $lt: endDate};
+    console.log("La fecha construida end: ", endDate);
+    if(query.startdate) queryObject['dt_Start_Log'] = {$gte: startDate, $lt: endDate};
     if(query.state) queryObject['cd_cebroker_state'] = query.state;
     return queryObject;
 }
@@ -120,4 +122,14 @@ var buildQueryString = function(query){
     if(query.enddate) queryString += 'enddate='+ query.enddate+"&";
     if(query.state) queryString += 'state=' + query.state;
     return queryString;
+}
+
+function buildDateFromString(dateString){
+    let separator = /\//.test(dateString)? '/' : '-';
+    // Parse the date parts to integers
+    var parts = dateString.split(separator);
+    var day = parseInt(parts[1], 10);
+    var month = parseInt(parts[0], 10);
+    var year = parseInt(parts[2], 10);
+    return new Date(month+'/'+day+'/'+year);
 }

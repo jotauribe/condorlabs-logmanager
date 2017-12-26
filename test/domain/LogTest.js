@@ -3,7 +3,7 @@
 import {Log} from '../../src/domain';
 
 
-test('Logs with the same data should be equals', () => {
+test('Logs with the same log should be equals', () => {
     let log = new Log("", 90, "","", "2017-12-12T00:00:00.003", "", 90, "2017-12-12T00:00:00.098890", "2017-12-12T00:00:00.546Z", "", "");
     let logFromJson = Log.buildFromJSON({
         cd_cebroker_state: "",

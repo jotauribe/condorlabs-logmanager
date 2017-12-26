@@ -1,7 +1,7 @@
 'use strict';
 
 
-var LogService = require('../services/log.service');
+var LogService = require('../../../application/services/log.service');
 
 exports.getLogs = function (request, response) {
     LogService.getMostRecentLogInDatabase(request.query, function (error, dbLogs) {

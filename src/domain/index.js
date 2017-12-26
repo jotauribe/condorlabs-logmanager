@@ -1,5 +1,5 @@
 "use strict";
 
-import Log from "./log";
+import Log from "./Log";
 
 export { Log };

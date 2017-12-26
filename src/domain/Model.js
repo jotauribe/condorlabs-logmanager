@@ -1,8 +1,10 @@
 "use strict";
 
+const date_regex = require('../../config/defaults')['date_regex'];
+
 export class Assert{
 
-    static DATE_REGEX = /^(\d{4}[\/\-](0?[1-9]|1[012])[\/\-](0?[1-9]|[12][0-9]|3[01]))(T(20|21|22|23|[0-1]?\d{1}):([0-5]?\d{1}):([0-5]?\d{1})(\.\d{3}(\d{3}|Z)?)?)?$/;
+    static DATE_REGEX = date_regex;
 
     /**
      *

@@ -1,6 +1,6 @@
 "use strict";
 
-import { Assert } from './model'
+import { Assert } from './Model'
 
 export default class Log {
 

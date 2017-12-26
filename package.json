@@ -11,9 +11,17 @@
     "testMatch": [
       "**/test/**/*.js?(x)",
       "**/?(*.)(spec|test).js?(x)"
+    ],
+    "moduleDirectories": [
+      "node_modules",
+      "<rootDir>/src",
+      "<rootDir>/test",
+      "src",
+      "test"
     ]
   },
   "dependencies": {
+    "app-module-path": "^2.2.0",
     "async": "^2.6.0",
     "body-parser": "~1.18.2",
     "cookie-parser": "~1.4.3",
