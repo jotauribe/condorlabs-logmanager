@@ -1,6 +1,6 @@
 "use strict";
 
-const date_regex = require('../../config/defaults')['date_regex'];
+const date_regex = require('../../config/constants')['date_regex'];
 
 export class Assert{
 

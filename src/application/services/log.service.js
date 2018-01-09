@@ -5,7 +5,7 @@ var http = require('https'),
     async = require('async'),
     Log = require('src/infrastructure/models/log.model'),
     Request = require('src/infrastructure/models/request.model'),
-    defaults = require('config/defaults'),
+    defaults = require('config/constants'),
     connectionURL = defaults['database_connection_string'],
     apiUrl = defaults['logs_endpoint'],
     dateRegex = defaults['date_regex'];
@@ -107,10 +107,8 @@ exports.getLogsFromAPI = function (query, until, callback) {
 var buildQueryObject = function (query) {
     var queryObject = {};
     let startDate = buildDateFromString(query.startdate);
-    console.log("La fecha construida star: ", startDate);
     let endDate = buildDateFromString(query.enddate);
     endDate.setHours(endDate.getHours() + 24);
-    console.log("La fecha construida end: ", endDate);
     if(query.startdate) queryObject['dt_Start_Log'] = {$gte: startDate, $lt: endDate};
     if(query.state) queryObject['cd_cebroker_state'] = query.state;
     return queryObject;
