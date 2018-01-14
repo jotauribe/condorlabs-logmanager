@@ -1,11 +1,7 @@
 'use strict';
 
 import {UserMapper} from "./LogMapper";
-import {LogModel} from "./LogModel";
-
-const db = require('mongoose'),
-    defaults = require('../../../config/defaults'),
-    connectionString = defaults['database_connection_string'];
+import {LogModel} from "./MongooseLogModel";
 
 export default class LogRepository{
 
@@ -20,8 +16,14 @@ export default class LogRepository{
         return await LogModel.find(query);
     }
 
-    async get(){
-        await LogModel.save()
+    async get(params, select, skip, limit, sort){
+        return await LogModel
+            .find(params)
+            .skip(skip)
+            .limit(limit)
+            .sort(sort)
+            .select(select)
+            .exec();
     }
 
 }

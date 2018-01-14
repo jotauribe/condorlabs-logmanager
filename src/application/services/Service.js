@@ -15,7 +15,6 @@ export default class Service extends EventEmitter {
         if(this.outputs[output]) {
             return this.addListener(output, handler);
         }
-
         throw new Error(`Invalid output "${output}" to service ${this.constructor.name}.`);
     }
 }

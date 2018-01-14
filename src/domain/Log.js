@@ -50,6 +50,7 @@ export default class Log {
         this._machine = machine;
     }
 
+    //TODO: Find a better place for this builder
     static buildFromJSON(json) {
         return new Log(
             json.cd_cebroker_state,
