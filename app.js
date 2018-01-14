@@ -6,7 +6,7 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 
 var index = require('./src/interfaces/web/routes/index');
-var logs = require('./src/interfaces/web/routes/logs')
+var logs = require('./src/interfaces/web/routes/LogEndpoints');
 
 var app = express();
 
@@ -18,5 +18,4 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', index);
 app.use('/logs', logs);
-
 module.exports = app;
