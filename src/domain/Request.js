@@ -2,7 +2,7 @@
 
 import {Assert} from './Model';
 
-class Request{
+export default class Request{
     
     constructor(response_time, date, parameters){
         this.response_time = response_time;
@@ -40,6 +40,5 @@ class Request{
     get parameters(){
         return this._parameters;
     }
-
 
 }
