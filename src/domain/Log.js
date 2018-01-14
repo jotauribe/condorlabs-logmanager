@@ -15,39 +15,18 @@ export default class Log {
                 endLogDate,
                 environment,
                 machine) {
-
-        Assert.isTypeOf(state, "string");
-        this._state = state;
-
-        Assert.isTypeOf(proCode, "number", "Pro Code must to be a string");
-        this._proCode = proCode;
-
-        Assert.isTypeOf(profession, "string", "Profession must to be a string");
-        this._profession = profession;
-
-        Assert.isTypeOf(licenseID, "string", "Lincese ID must to be a string");
-        this._licenseID = licenseID;
-
-        Assert.isValidDate(cycleEndDate,"Cycle End Date must to be a valid Date");
-        this._cycleEndDate = new Date(cycleEndDate);
-
-        Assert.isTypeOf(complianceStatus, "string", "Compliance Status must to be a string");
-        this._complianceStatus = complianceStatus;
-
-        Assert.isTypeOf(clientID, "number", "Client ID must to be a number");
-        this._clientID = clientID;
-
-        Assert.isValidDate(startLogDate, "Start Log Date must to be a valid Date");
-        this._startLogDate = new Date(startLogDate);
-
-        Assert.isValidDate(endLogDate, "End Log Date must to be a valid Date");
-        this._endLogDate = new Date(endLogDate);
-
-        Assert.isTypeOf(environment, "string", "Environment Status must to be a string");
-        this._environment = environment;
-
-        Assert.isTypeOf(machine, "string", "Machine must to be a string");
-        this._machine = machine;
+        
+        this.state = state;
+        this.proCode = proCode;
+        this.profession = profession;
+        this.licenseID = licenseID;
+        this.cycleEndDate = cycleEndDate;
+        this.complianceStatus = complianceStatus;
+        this.clientID = clientID;
+        this.startLogDate = startLogDate;
+        this.endLogDate = endLogDate;
+        this.environment = environment;
+        this.machine = machine;
     }
 
     //TODO: Find a better place for this builder
@@ -92,7 +71,7 @@ export default class Log {
     }
 
     set complianceStatus(value) {
-        this.assertTypeOf(value, "string", "Compliance Status must to be a string");
+        Assert.isTypeOf(value, "string", "Compliance Status must to be a string");
         this._complianceStatus = value;
     }
 
