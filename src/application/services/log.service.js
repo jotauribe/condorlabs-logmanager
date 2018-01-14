@@ -3,11 +3,12 @@
 var http = require('https'),
     mongoose = require('mongoose'),
     async = require('async'),
-    Log = require('../models/log.model'),
-    Request = require('../models/request.model'),
-    defaults = require('../config/defaults'),
+    Log = require('src/infrastructure/models/log.model'),
+    Request = require('src/infrastructure/models/request.model'),
+    defaults = require('config/constants'),
     connectionURL = defaults['database_connection_string'],
-    apiUrl = defaults['logs_endpoint'];
+    apiUrl = defaults['logs_endpoint'],
+    dateRegex = defaults['date_regex'];
 
 mongoose.Promise = global.Promise;
 mongoose.connect(connectionURL);
@@ -35,7 +36,7 @@ exports.getMostRecentLogInDatabase = function (query, callback) {
            if (error) callback(error, null);
            if(log[0]){
                var nLog = JSON.parse(JSON.stringify(log[0]));
-               console.log("el original: ",nLog, "date: ", nLog.dt_Start_Log);
+               console.log("MOST RECENT LOG: ",nLog, "\ndate: ", nLog.dt_Start_Log);
            }
            callback(null, log);
        });
@@ -75,9 +76,7 @@ exports.getLogsFromAPI = function (query, until, callback) {
                                 logs.push(logFromAPI);
                                 var newLog = new Log(logFromAPI);
                                 newLog.save(function(error, log) {
-                                    if (error){
-                                        callback(error);
-                                    }
+                                    if (error) callback(error);
                                 })
                             }}
                     }
@@ -107,9 +106,10 @@ exports.getLogsFromAPI = function (query, until, callback) {
 
 var buildQueryObject = function (query) {
     var queryObject = {};
-    let endDate = new Date(query.enddate);
+    let startDate = buildDateFromString(query.startdate);
+    let endDate = buildDateFromString(query.enddate);
     endDate.setHours(endDate.getHours() + 24);
-    if(query.startdate) queryObject['dt_Start_Log'] = {$gte: new Date(query.startdate), $lt: endDate};
+    if(query.startdate) queryObject['dt_Start_Log'] = {$gte: startDate, $lt: endDate};
     if(query.state) queryObject['cd_cebroker_state'] = query.state;
     return queryObject;
 }
@@ -120,4 +120,14 @@ var buildQueryString = function(query){
     if(query.enddate) queryString += 'enddate='+ query.enddate+"&";
     if(query.state) queryString += 'state=' + query.state;
     return queryString;
+}
+
+function buildDateFromString(dateString){
+    let separator = /\//.test(dateString)? '/' : '-';
+    // Parse the date parts to integers
+    var parts = dateString.split(separator);
+    var day = parseInt(parts[1], 10);
+    var month = parseInt(parts[0], 10);
+    var year = parseInt(parts[2], 10);
+    return new Date(month+'/'+day+'/'+year);
 }
