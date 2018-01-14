@@ -3,7 +3,7 @@
 require('app-module-path').addPath(__dirname+'../../../');
 
 import LogRepository from '../../../src/infrastructure/log/MongooseLogRepository';
-import {Log} from "domain";
+import {Log} from "../../../src/domain";
 
 test('Logs with the same log should be equals', () => {
     Log.buildFromJSON({});
