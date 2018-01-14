@@ -4,7 +4,7 @@ import {UserMapper} from "./LogMapper";
 import {LogModel} from "./LogModel";
 
 const db = require('mongoose'),
-    defaults = require('config/defaults'),
+    defaults = require('../../config/defaults'),
     connectionString = defaults['database_connection_string'];
 
 export default class LogRepository{
